@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>MiniCode</title>
+
+<style>
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#181818;
+  color:#ccc;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+button{
+  font:inherit;
+  color:inherit;
+}
+
+.app{
+  height:100dvh;
+  display:grid;
+  grid-template-columns:48px 190px 1fr;
+  grid-template-rows:1fr 24px;
+}
+
+/* ACTIVITY BAR */
+.activity{
+  background:#181818;
+  border-right:1px solid #252525;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.activity button{
+  width:48px;
+  height:48px;
+  border:0;
+  background:transparent;
+  color:#777;
+  font-size:20px;
+  cursor:pointer;
+}
+
+.activity button.active{
+  color:#eee;
+  border-left:2px solid #fff;
+}
+
+.activity button:hover{
+  color:#ddd;
+}
+
+.activity-bottom{
+  margin-top:auto;
+}
+
+/* SIDEBAR */
+.sidebar{
+  background:#181818;
+  border-right:1px solid #292929;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+}
+
+.side-title{
+  height:35px;
+  display:flex;
+  align-items:center;
+  padding:0 12px;
+  font-size:11px;
+  color:#aaa;
+  letter-spacing:.5px;
+}
+
+.section{
+  height:27px;
+  display:flex;
+  align-items:center;
+  padding:0 8px;
+  font-size:11px;
+  font-weight:bold;
+  color:#aaa;
+  cursor:pointer;
+}
+
+.section span{
+  margin-right:5px;
+  font-size:9px;
+}
+
+.file{
+  height:29px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding-left:18px;
+  font-size:13px;
+  color:#aaa;
+  cursor:pointer;
+}
+
+.file:hover{
+  background:#252525;
+  color:#ddd;
+}
+
+.file.active{
+  background:#2a2d2e;
+  color:#fff;
+}
+
+.file.html{color:#e44d26}
+.file.css{color:#379ad6}
+.file.js{color:#e8d44d}
+
+/* WORKSPACE */
+.workspace{
+  min-width:0;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+}
+
+/* TABS */
+.tabs{
+  height:35px;
+  min-height:35px;
+  display:flex;
+  background:#181818;
+  border-bottom:1px solid #292929;
+  overflow-x:auto;
+}
+
+.tab{
+  height:35px;
+  min-width:125px;
+  max-width:180px;
+  border:0;
+  border-right:1px solid #292929;
+  background:#181818;
+  color:#888;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:0 12px;
+  font-size:12px;
+  cursor:pointer;
+}
+
+.tab.active{
+  background:#1f1f1f;
+  color:#eee;
+  border-top:1px solid #777;
+}
+
+.tab .close{
+  margin-left:auto;
+  color:#666;
+}
+
+/* EDITOR + PREVIEW */
+.content{
+  flex:1;
+  min-height:0;
+  display:flex;
+  position:relative;
+}
+
+.editor-wrap{
+  flex:1;
+  min-width:0;
+  min-height:0;
+  display:flex;
+  background:#1e1e1e;
+}
+
+.lines{
+  width:48px;
+  min-width:48px;
+  padding-top:12px;
+  text-align:right;
+  padding-right:12px;
+  color:#555;
+  background:#1e1e1e;
+  font:13px/1.65 Consolas,"Courier New",monospace;
+  overflow:hidden;
+  user-select:none;
+}
+
+.editor{
+  flex:1;
+  width:0;
+  height:100%;
+  border:0;
+  outline:0;
+  resize:none;
+  padding:12px 16px;
+  background:#1e1e1e;
+  color:#d4d4d4;
+  font:13px/1.65 Consolas,"Courier New",monospace;
+  white-space:pre;
+  overflow:auto;
+  tab-size:2;
+  caret-color:#fff;
+}
+
+/* PREVIEW */
+.preview{
+  display:none;
+  width:50%;
+  min-width:0;
+  flex-direction:column;
+  border-left:1px solid #333;
+  background:#fff;
+}
+
+.preview.open{
+  display:flex;
+}
+
+.preview-head{
+  height:30px;
+  background:#252526;
+  color:#aaa;
+  display:flex;
+  align-items:center;
+  padding:0 10px;
+  font-size:11px;
+}
+
+.preview-head button{
+  margin-left:auto;
+  border:0;
+  background:none;
+  color:#aaa;
+  cursor:pointer;
+}
+
+iframe{
+  flex:1;
+  width:100%;
+  border:0;
+  background:white;
+}
+
+/* PANEL */
+.panel{
+  height:145px;
+  min-height:145px;
+  background:#181818;
+  border-top:1px solid #303030;
+  display:flex;
+  flex-direction:column;
+}
+
+.panel-tabs{
+  height:32px;
+  min-height:32px;
+  display:flex;
+  align-items:center;
+  border-bottom:1px solid #292929;
+}
+
+.panel-tab{
+  height:32px;
+  padding:0 14px;
+  border:0;
+  border-bottom:1px solid transparent;
+  background:none;
+  color:#888;
+  font-size:11px;
+  cursor:pointer;
+}
+
+.panel-tab.active{
+  color:#eee;
+  border-bottom-color:#ddd;
+}
+
+.console{
+  flex:1;
+  overflow:auto;
+  padding:7px 12px;
+  font:12px Consolas,"Courier New",monospace;
+}
+
+.log{
+  margin-bottom:4px;
+  color:#aaa;
+}
+
+.log.error{color:#f48771}
+.log.warn{color:#dcdcaa}
+.log.success{color:#89d185}
+
+/* STATUS BAR */
+.statusbar{
+  grid-column:1/-1;
+  background:#181818;
+  border-top:1px solid #292929;
+  display:flex;
+  align-items:center;
+  padding:0 10px;
+  font-size:10px;
+  color:#888;
+}
+
+.status-right{
+  margin-left:auto;
+  display:flex;
+  gap:15px;
+}
+
+/* TOOLBAR */
+.toolbar{
+  height:32px;
+  display:flex;
+  align-items:center;
+  border-bottom:1px solid #292929;
+  background:#181818;
+}
+
+.toolbar button{
+  height:31px;
+  padding:0 10px;
+  border:0;
+  background:transparent;
+  color:#999;
+  font-size:11px;
+  cursor:pointer;
+}
+
+.toolbar button:hover{
+  background:#292929;
+  color:#fff;
+}
+
+/* MOBILE */
+@media(max-width:700px){
+
+  .app{
+    grid-template-columns:1fr;
+    grid-template-rows:1fr 24px;
+  }
+
+  .activity{
+    display:none;
+  }
+
+  .sidebar{
+    display:none;
+  }
+
+  .preview{
+    position:absolute;
+    inset:0;
+    width:100%;
+    z-index:20;
+  }
+
+  .preview.open{
+    display:flex;
+  }
+
+  .editor-wrap{
+    width:100%;
+  }
+
+  .panel{
+    height:125px;
+    min-height:125px;
+  }
+
+  .lines{
+    width:38px;
+    min-width:38px;
+    padding-right:8px;
+    font-size:12px;
+  }
+
+  .editor{
+    padding-left:10px;
+    padding-right:10px;
+    font-size:12px;
+  }
+
+  .tab{
+    min-width:110px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- ACTIVITY BAR -->
+  <aside class="activity">
+
+    <button class="active" title="Explorer">▣</button>
+    <button title="Search" onclick="focusEditor()">⌕</button>
+    <button title="Run" onclick="runCode()">▷</button>
+
+    <div class="activity-bottom">
+      <button title="Settings">⚙</button>
+    </div>
+
+  </aside>
+
+
+  <!-- EXPLORER -->
+  <aside class="sidebar">
+
+    <div class="side-title">EXPLORER</div>
+
+    <div class="section">
+      <span>⌄</span> PROJECT
+    </div>
+
+    <div class="file html active" onclick="switchFile('html')">
+      ◇ &nbsp;index.html
+    </div>
+
+    <div class="file css" onclick="switchFile('css')">
+      ◇ &nbsp;style.css
+    </div>
+
+    <div class="file js" onclick="switchFile('js')">
+      ◇ &nbsp;script.js
+    </div>
+
+  </aside>
+
+
+  <!-- WORKSPACE -->
+  <main class="workspace">
+
+    <div class="tabs">
+
+      <button class="tab active" id="tab-html"
+              onclick="switchFile('html')">
+        <span style="color:#e44d26">◇</span>
+        index.html
+        <span class="close">×</span>
+      </button>
+
+      <button class="tab" id="tab-css"
+              onclick="switchFile('css')">
+        <span style="color:#379ad6">◇</span>
+        style.css
+        <span class="close">×</span>
+      </button>
+
+      <button class="tab" id="tab-js"
+              onclick="switchFile('js')">
+        <span style="color:#e8d44d">◇</span>
+        script.js
+        <span class="close">×</span>
+      </button>
+
+    </div>
+
+
+    <div class="toolbar">
+
+      <button onclick="runCode()">▶ Run</button>
+      <button onclick="togglePreview()">Preview</button>
+      <button onclick="saveProject()">Save</button>
+      <button onclick="newProject()">New</button>
+
+    </div>
+
+
+    <div class="content">
+
+      <div class="editor-wrap">
+
+        <div class="lines" id="lines"></div>
+
+        <textarea
+          id="editor"
+          class="editor"
+          spellcheck="false"
+          autocorrect="off"
+          autocapitalize="off"
+          autocomplete="off"></textarea>
+
+      </div>
+
+
+      <section class="preview" id="preview">
+
+        <div class="preview-head">
+          Preview
+          <button onclick="togglePreview()">×</button>
+        </div>
+
+        <iframe
+          id="frame"
+          sandbox="allow-scripts allow-modals allow-forms">
+        </iframe>
+
+      </section>
+
+    </div>
+
+
+    <!-- BOTTOM PANEL -->
+    <section class="panel">
+
+      <div class="panel-tabs">
+
+        <button class="panel-tab active">
+          PROBLEMS
+        </button>
+
+        <button class="panel-tab">
+          OUTPUT
+        </button>
+
+        <button class="panel-tab">
+          DEBUG CONSOLE
+        </button>
+
+      </div>
+
+      <div class="console" id="console">
+        <div class="log">
+          MiniCode ready.
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- STATUS BAR -->
+  <footer class="statusbar">
+
+    <span id="statusLanguage">HTML</span>
+
+    <div class="status-right">
+      <span id="position">Ln 1, Col 1</span>
+      <span>Spaces: 2</span>
+      <span>UTF-8</span>
+    </div>
+
+  </footer>
+
+</div>
+
+
+<script>
+
+/* =========================
+   PROJECT
+========================= */
+
+const defaultFiles = {
+
+html:
+`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+  <title>My Website</title>
+</head>
+
+<body>
+
+  <h1>Hello World!</h1>
+  <p>Edit kode ini.</p>
+
+  <button onclick="hello()">
+    Klik aku
+  </button>
+
+</body>
+</html>`,
+
+css:
+`body {
+  margin: 0;
+  padding: 40px;
+  font-family: Arial;
+  background: #111;
+  color: white;
+  text-align: center;
+}
+
+h1 {
+  color: #fff;
+}
+
+button {
+  padding: 10px 18px;
+  border: 0;
+  cursor: pointer;
+}`,
+
+js:
+`function hello() {
+  console.log("Button diklik!");
+  alert("Halo dari MiniCode!");
+}`
+
+};
+
+let files = {
+  html: defaultFiles.html,
+  css: defaultFiles.css,
+  js: defaultFiles.js
+};
+
+let current = "html";
+
+const editor = document.getElementById("editor");
+const lines = document.getElementById("lines");
+const consoleBox = document.getElementById("console");
+const preview = document.getElementById("preview");
+const frame = document.getElementById("frame");
+
+
+/* =========================
+   LOAD
+========================= */
+
+function load(){
+
+  const saved =
+    localStorage.getItem("minicode-vscode");
+
+  if(!saved) return;
+
+  try{
+
+    const data = JSON.parse(saved);
+
+    if(data.html) files.html = data.html;
+    if(data.css) files.css = data.css;
+    if(data.js) files.js = data.js;
+
+  }catch(e){}
+
+}
+
+
+/* =========================
+   SWITCH FILE
+========================= */
+
+function switchFile(type){
+
+  files[current] = editor.value;
+
+  current = type;
+
+  editor.value = files[type];
+
+  document.querySelectorAll(".tab")
+    .forEach(x => x.classList.remove("active"));
+
+  document.querySelectorAll(".file")
+    .forEach(x => x.classList.remove("active"));
+
+  document.getElementById("tab-"+type)
+    .classList.add("active");
+
+  document.querySelector(
+    `.file.${type}`
+  ).classList.add("active");
+
+  document.getElementById(
+    "statusLanguage"
+  ).textContent =
+    type === "html"
+      ? "HTML"
+      : type === "css"
+      ? "CSS"
+      : "JavaScript";
+
+  updateLines();
+  updatePosition();
+
+  editor.focus();
+}
+
+
+/* =========================
+   LINE NUMBERS
+========================= */
+
+function updateLines(){
+
+  const count =
+    editor.value.split("\n").length;
+
+  let html = "";
+
+  for(let i=1;i<=count;i++){
+    html += i + "<br>";
+  }
+
+  lines.innerHTML = html;
+}
+
+
+editor.addEventListener("scroll",()=>{
+  lines.scrollTop = editor.scrollTop;
+});
+
+
+/* =========================
+   POSITION
+========================= */
+
+function updatePosition(){
+
+  const before =
+    editor.value.substring(
+      0,
+      editor.selectionStart
+    );
+
+  const rows = before.split("\n");
+
+  const line = rows.length;
+
+  const col =
+    rows[rows.length-1].length + 1;
+
+  document.getElementById("position")
+    .textContent =
+    `Ln ${line}, Col ${col}`;
+}
+
+
+editor.addEventListener("input",()=>{
+
+  files[current] = editor.value;
+
+  updateLines();
+  updatePosition();
+
+  localStorage.setItem(
+    "minicode-vscode",
+    JSON.stringify(files)
+  );
+
+});
+
+editor.addEventListener("keyup",updatePosition);
+editor.addEventListener("click",updatePosition);
+
+
+/* =========================
+   TAB KEY
+========================= */
+
+editor.addEventListener("keydown",e=>{
+
+  if(e.key === "Tab"){
+
+    e.preventDefault();
+
+    const start =
+      editor.selectionStart;
+
+    const end =
+      editor.selectionEnd;
+
+    editor.value =
+      editor.value.substring(0,start) +
+      "  " +
+      editor.value.substring(end);
+
+    editor.selectionStart =
+      editor.selectionEnd =
+      start + 2;
+
+    files[current] = editor.value;
+
+    updateLines();
+    updatePosition();
+  }
+
+
+  /* CTRL + ENTER */
+
+  if(
+    (e.ctrlKey || e.metaKey) &&
+    e.key === "Enter"
+  ){
+
+    e.preventDefault();
+
+    runCode();
+  }
+
+
+  /* CTRL + S */
+
+  if(
+    (e.ctrlKey || e.metaKey) &&
+    e.key.toLowerCase() === "s"
+  ){
+
+    e.preventDefault();
+
+    saveProject();
+  }
+
+});
+
+
+/* =========================
+   RUN
+========================= */
+
+function runCode(){
+
+  files[current] = editor.value;
+
+  const html = files.html;
+  const css = files.css;
+  const js = files.js;
+
+  clearConsole();
+
+  const code = `
+
+${html}
+
+<style>
+${css}
+</style>
+
+<script>
+
+(function(){
+
+  function send(level,args){
+
+    parent.postMessage({
+
+      type:"console",
+
+      level:level,
+
+      message:args.map(x=>{
+
+        try{
+
+          return typeof x === "object"
+            ? JSON.stringify(x)
+            : String(x);
+
+        }catch{
+
+          return String(x);
+
+        }
+
+      }).join(" ")
+
+    },"*");
+
+  }
+
+  const oldLog = console.log;
+  const oldWarn = console.warn;
+  const oldError = console.error;
+
+  console.log = function(...args){
+
+    send("log",args);
+    oldLog(...args);
+
+  };
+
+  console.warn = function(...args){
+
+    send("warn",args);
+    oldWarn(...args);
+
+  };
+
+  console.error = function(...args){
+
+    send("error",args);
+    oldError(...args);
+
+  };
+
+  window.onerror =
+    function(message,source,line){
+
+      send("error",[
+        message + " (line " + line + ")"
+      ]);
+
+    };
+
+  try{
+
+    ${js}
+
+  }catch(error){
+
+    send("error",[error.message]);
+
+  }
+
+})();
+
+<\/script>
+`;
+
+  frame.srcdoc = code;
+
+  preview.classList.add("open");
+
+  addLog(
+    "Build selesai — preview dijalankan.",
+    "success"
+  );
+}
+
+
+/* =========================
+   CONSOLE
+========================= */
+
+window.addEventListener("message",e=>{
+
+  if(!e.data) return;
+
+  if(e.data.type === "console"){
+
+    addLog(
+      e.data.message,
+      e.data.level
+    );
+
+  }
+
+});
+
+
+function addLog(text,type="log"){
+
+  const div =
+    document.createElement("div");
+
+  div.className =
+    "log " + type;
+
+  div.textContent =
+    type === "error"
+      ? "✕ " + text
+      : type === "warn"
+      ? "⚠ " + text
+      : "> " + text;
+
+  consoleBox.appendChild(div);
+
+  consoleBox.scrollTop =
+    consoleBox.scrollHeight;
+}
+
+
+function clearConsole(){
+
+  consoleBox.innerHTML = "";
+
+}
+
+
+/* =========================
+   PREVIEW
+========================= */
+
+function togglePreview(){
+
+  preview.classList.toggle("open");
+
+}
+
+
+/* =========================
+   SAVE
+========================= */
+
+function saveProject(){
+
+  files[current] = editor.value;
+
+  localStorage.setItem(
+    "minicode-vscode",
+    JSON.stringify(files)
+  );
+
+  addLog(
+    "Project saved.",
+    "success"
+  );
+}
+
+
+/* =========================
+   NEW
+========================= */
+
+function newProject(){
+
+  if(
+    !confirm(
+      "Create new project?\nKode saat ini akan diganti."
+    )
+  ) return;
+
+  files = {
+    html: defaultFiles.html,
+    css: defaultFiles.css,
+    js: defaultFiles.js
+  };
+
+  localStorage.removeItem(
+    "minicode-vscode"
+  );
+
+  switchFile("html");
+
+  clearConsole();
+
+  addLog(
+    "New project created.",
+    "success"
+  );
+}
+
+
+/* =========================
+   SEARCH BUTTON
+========================= */
+
+function focusEditor(){
+
+  editor.focus();
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+load();
+
+switchFile("html");
+
+</script>
+
+</body>
+</html>
